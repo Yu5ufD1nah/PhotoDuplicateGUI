@@ -98,23 +98,15 @@ namespace PhotoDuplicateGUI
 
         private bool AreImagesSimilar(string filePath1, string filePath2)
         {
-            try
-            {
-                using (var image1 = new MagickImage(filePath1))
-                using (var image2 = new MagickImage(filePath2))
-                {
-                    var diff = image1.Compare(image2, ErrorMetric.RootMeanSquared);
-                    return diff < 0.01; // Adjust sensitivity
-                }
-            }
-            catch (Exception ex)
-            {
-                listBoxLog.Items.Add($"Error comparing images:\n{filePath1} or {filePath2} - {ex.Message}");
-                return false;
-            }
+            ulong hash1 = ImageHasher.ComputePHash(filePath1);
+            ulong hash2 = ImageHasher.ComputePHash(filePath2);
+
+            double similarity = ImageHasher.CompareHashes(hash1, hash2);
+
+            // Consider images similar if similarity > 0.9
+            return similarity > 0.9;
         }
 
-  
     }
 }
 
